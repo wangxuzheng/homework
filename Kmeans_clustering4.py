@@ -27,7 +27,7 @@ def Kmeans4():
         y_pred = cluster.labels_  # 获取训练后对象的每个样本的标签
         # 重新变成图片308*468
         y_pred = y_pred.reshape(h, w)
-        index = '3{}{}'.format(str(int(k / 2)), str(i))
+        index = '2{}{}'.format(str(int(k / 2)), str(i))
         f = fig.add_subplot(int(index))
         f.set_title('K = {}'.format(i))
         f.imshow(y_pred)
