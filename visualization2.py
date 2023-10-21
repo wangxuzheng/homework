@@ -9,7 +9,6 @@ import PIL.Image as Image
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
 def draw_image_data():
     COL = 10  # 指定拼接图片的列数
     ROW = 10  # 指定拼接图片的行数
@@ -17,19 +16,19 @@ def draw_image_data():
     PATH = 'faces/'
     file_list = list(os.walk(PATH))
     person_name = file_list[0][1]
-    file_list.pop(0) #去掉根目录内容
+    file_list.pop(0)  # 去掉根目录内容
     file_uri_list = []
-    for uri,dir,file_name_list in file_list:
+    for uri, dir, file_name_list in file_list:
         file_uri = []
         for file_name in file_name_list:
-            file_uri.append(uri+'/'+file_name) #得到图片完整路径
+            file_uri.append(uri + '/' + file_name)  # 得到图片完整路径
         file_uri_list.append(file_uri)
-    image_dict = dict(zip(person_name,file_uri_list))#名字：图像列表
-    background = Image.new('RGB',(IMAGE_SIZE[0]*COL,IMAGE_SIZE[1]*ROW))
+    image_dict = dict(zip(person_name, file_uri_list))  # 名字：图像列表
+    background = Image.new('RGB', (IMAGE_SIZE[0] * COL, IMAGE_SIZE[1] * ROW))
     for row in range(ROW):
         name = person_name.pop(0)
         for col in range(COL):
-            background.paste(Image.open(image_dict[name][col]), (0 + IMAGE_SIZE[0]*col, 0 + IMAGE_SIZE[1]*row))
+            background.paste(Image.open(image_dict[name][col]), (0 + IMAGE_SIZE[0] * col, 0 + IMAGE_SIZE[1] * row))
     plt.imshow(background)
     plt.show()
 

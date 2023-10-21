@@ -15,7 +15,12 @@ from Kmeans_clustering5 import Kmeans5
 from pca_clustering1 import eigenfaces_RGB
 from pca_clustering2 import eigenfaces_GRAY
 from pca_clustering3 import eigenfaces_performance
+from LDA_classification1 import LDA1
+from LDA_classification2 import LDA2
+from LDA_classification3 import LDA3
+from NaiveBayes_classification1 import NaiveBayesAndKNN
+from NaiveBayes_classification2 import spam_detection_comparison
 if __name__ == '__main__':
-    Kmeans()
+    spam_detection_comparison()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

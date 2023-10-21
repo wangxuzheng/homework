@@ -24,6 +24,7 @@ def Kmeans4():
     for i in range(2, k + 1):
         cluster = KMeans(n_clusters=i, random_state=9).fit(X)
         centroid = cluster.cluster_centers_  # 查看聚类后的质心
+        print(centroid)
         y_pred = cluster.labels_  # 获取训练后对象的每个样本的标签
         # 重新变成图片308*468
         y_pred = y_pred.reshape(h, w)
@@ -41,12 +42,12 @@ def image_compress(original, k=6):
 
     # k = n时的压缩图片
     cluster = KMeans(n_clusters=k, random_state=9).fit(X)
-    centroid = cluster.cluster_centers_  # 查看聚类后的质心
+    centroid = cluster.cluster_centers_  # 查看聚类后的质心(即中心点颜色)
     labels = cluster.labels_  # 获取训练后对象的每个样本的标签
     # 按照h,w,c创建一个空白图片
     img = np.zeros((h, w, c))
     label_index = 0
-    # 通过for循环，遍历img中每一个点，并且从labels中取出下标对应的聚类重新给img赋值
+    # 通过for循环，遍历img中每一个点，并且从labels中取出下标对应的聚类(即中心点颜色)重新给img赋值
     for i in range(h):
         for j in range(w):
             img[i][j] = centroid[labels[label_index]]
@@ -54,7 +55,7 @@ def image_compress(original, k=6):
     return img
 
 
-def show_compressed_image(path="stones.jpg", k=6):
+def show_compressed_image(path="stones.jpg", k=9):
     original = plt.imread(path)
     # 除以255，将像素点的值变为0-1之间
     original = original / 255
