@@ -1,5 +1,6 @@
 # 工具
 import os
+import pickle
 import numpy as np
 import pandas as pd
 from matplotlib import offsetbox
@@ -7,8 +8,12 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from numpy import asarray
 from sklearn import naive_bayes
+from sklearn.datasets import load_digits
+from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from clustering_performance import cluster_acc
+from sklearn.linear_model import LogisticRegression, LinearRegression
+from sklearn import svm
 
 def get_face_images(path, n_people=10, n_faces=20):
     """
@@ -42,6 +47,7 @@ def get_face_images(path, n_people=10, n_faces=20):
         i += 1
     for file_uri in file_uri_list:
         img = plt.imread(file_uri)  # 图片shape为(200,180,3)
+        #img = rgb2gray(img)  #转为黑白图
         img = img.reshape(1, -1)  # 将（200x180x3）的图片转为一维 108000
         img = pd.DataFrame(img)
         photos_data = pd.concat([photos_data, img], ignore_index=True)
@@ -74,7 +80,6 @@ def show_digit_image(X_data, digit_images):
                 offsetbox.OffsetImage(images[i], cmap=plt.cm.gray_r), X[i])
             imageboxs.append(imagebox)
     return imageboxs
-
 
 def get_17flower_images(path, n_type=17, n_flower=80,height=200,width=180):
     """
@@ -117,12 +122,21 @@ def get_17flower_images(path, n_type=17, n_flower=80,height=200,width=180):
         original = Image.open(file_uri)
         img = original.resize((w, h), Image.NEAREST)  # 统一所有图片像素为(w,h)
         img = asarray(img)  # 转为ndarray即（200，180，3）
+       # img = rgb2gray(img)  #转为黑白图
         img = img.reshape(1, -1)  # 将（200x180x3）的图片转为一维 108000
         img = pd.DataFrame(img)
         flowers_data = pd.concat([flowers_data, img], ignore_index=True)
     flowers_data = flowers_data.values  # shape为 (样本数,特征数) 即200x180x3个特征。 values将dataframe转为ndarray
     return flowers_data, truncated_y_true_list
 
+#将彩色图像转为灰度图片  ，Gray = R * 0.299 + G * 0.587 + B * 0.114
+def rgb2gray(color_image):
+    gray_image = []
+    for i in range(color_image.shape[0]):
+        for j in range(color_image.shape[1]):
+            #使用转换公式进行彩色灰度转换
+            gray_image.append(int(color_image[i,j,0]*0.3+color_image[i,j,1]*0.59+color_image[i,j,2]*0.11))
+    return np.array(gray_image).reshape(color_image.shape[0],color_image.shape[1])
 
 # 将多张图片拼接成一张图，返回拼接后的图
 def get_pasted_image(IMAGE_DATA, IMAGE_SIZE, ROW, COL):
@@ -153,6 +167,40 @@ def get_pasted_image(IMAGE_DATA, IMAGE_SIZE, ROW, COL):
             i = i + 1
     return background
 
+#获取本地测试数据（17flowers、digits、和face images）用于后续分类方法比较
+
+def get_local_sample ():
+    # 读取数据
+    path_flower = '17flowers/'
+    path_face = 'face_images/'
+    digits = load_digits()
+    photos_data, photos_true = get_face_images(path_face, 10, 20)  # 只选取10个人，每个人20张图片
+    flowers_data, flowers_true = get_17flower_images(path_flower, 10, 20)  # 只选取10类花，每种20张图片
+    # flowers_data, flowers_true = get_17flower_images(path_flower, 17, 80, 200,200)  # 获取完整图片集17类花，每种80张
+    digits_data = digits.data
+    digits_true = digits.target
+
+    # 拆分训练集和数据集
+    X_train_flowers, X_test_flowers, y_train_flowers, y_test_flowers = \
+        train_test_split(flowers_data, flowers_true, test_size=0.2, random_state=22)
+    X_train_digits, X_test_digits, y_train_digits, y_test_digits = \
+        train_test_split(digits_data, digits_true, test_size=0.2, random_state=22)
+    X_train_faces, X_test_faces, y_train_faces, y_test_faces = \
+        train_test_split(photos_data, photos_true, test_size=0.2, random_state=22)
+
+
+    flowers = [X_train_flowers, X_test_flowers, y_train_flowers, y_test_flowers]
+    digits = [X_train_digits, X_test_digits, y_train_digits, y_test_digits]
+    face_images = [X_train_faces, X_test_faces, y_train_faces, y_test_faces]
+
+    return flowers,digits,face_images
+
+
+def unpickle(file):  # 官方给的例程
+    with open(file, 'rb') as fo:
+        cifar = pickle.load(fo, encoding='bytes')
+    return cifar
+
 
 # KNN分类器
 def get_KNN_acc(*data):
@@ -164,12 +212,45 @@ def get_KNN_acc(*data):
     return ACC
 
 
-# 高斯贝叶斯分类器
+# 高斯贝叶斯分类器  ,高斯朴素贝叶斯可用于 特征为连续值 的分类问题，比如iris分类
+"""
+使用CategoricalNB时会遇到问题，
+CategoricalNB expects a certain number of classes in the feature vectors during training and testing
+The train_test_split function does not guarantee this,
+"""
 def get_GaussianNB_acc(*data):
     X_train, X_test, y_train, y_test = data
     nb = naive_bayes.GaussianNB()  # ['BernoulliNB', 'GaussianNB', 'MultinomialNB', 'ComplementNB','CategoricalNB']
     nb.fit(X_train, y_train)
+    # ACC = nb.score(X_test, y_test)
     y_sample = nb.predict(X_test)
     ACC = cluster_acc(y_test, y_sample)
     return ACC
 
+# 逻辑回归分类器
+def get_LogisticRe_acc(*data):
+    X_train, X_test, y_train, y_test = data
+    lr = LogisticRegression(max_iter=50000)
+    lr.fit(X_train, y_train)
+    y_sample = lr.predict(X_test)
+    ACC = cluster_acc(y_test, y_sample)
+    return ACC
+
+def get_LinearRe_acc(*data):
+    X_train, X_test, y_train, y_test = data
+    linear = LinearRegression()
+    linear.fit(X_train, y_train)
+    ACC = linear.score(X_test, y_test)
+    why = linear.predict(X_test)  #为什么predict的结果是0.5486xxxx，不是整数？
+    #线性回归的分类，但是因为返回的是连续的数值（并非类别标签），所以要设置一个阈值手动划分一下类别
+    return ACC
+
+
+def get_SVM_acc(kernel,*data):
+    X_train, X_test, y_train, y_test = data
+    # (kernel) It must be one of 'linear', 'poly', 'rbf', 'sigmoid', 'precomputed' or a callable
+    support= svm.SVC(C=2, kernel=kernel, gamma=10, decision_function_shape='ovo')
+    support.fit(X_train, y_train)
+    y_sample = support.predict(X_test)
+    ACC = cluster_acc(y_test, y_sample)
+    return ACC

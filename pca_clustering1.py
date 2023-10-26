@@ -27,7 +27,7 @@ def eigenfaces_RGB():
     pca = PCA(n_components=n_components,svd_solver='randomized').fit(photos_data)
     components = pca.components_#pca的10个主成分（10，108000），即10个主要的新特征（新基向量）
     components = scaler.fit_transform(components)  # MinMaxScaler expect array with dim <= 2.
-    eigenfaces = components.reshape(n_components,200,180,3)
+    eigenfaces = components.reshape(n_components,h,w,c)
     # 画特征脸
     fig, ax = plt.subplots(nrows=1,ncols=n_components, sharex=True, sharey=True)
     plt.subplots_adjust(wspace=0, hspace=0)

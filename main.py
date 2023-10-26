@@ -1,4 +1,4 @@
-
+import SVM_classification3
 from visualization1 import draw_cycle
 from visualization1 import draw_moon
 from visualization2 import draw_image_data
@@ -20,7 +20,12 @@ from LDA_classification2 import LDA2
 from LDA_classification3 import LDA3
 from NaiveBayes_classification1 import NaiveBayesAndKNN
 from NaiveBayes_classification2 import spam_detection_comparison
+from LogisticRegression_classification1 import LRandNBandKNN
+from LogisticRegression_classification2 import comparision_CIFAR10
+from SVM_classification1 import classifier_comparison
+from SVM_classification2 import LRandNBandKNNandSVM
+from SVM_classification3 import comparision_CIFAR10
 if __name__ == '__main__':
-    spam_detection_comparison()
+    classifier_comparison()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

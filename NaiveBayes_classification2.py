@@ -19,9 +19,9 @@ def spam_detection_comparison():
     # print("X_test.shape =", X_test.shape)
 
     # 朴素贝叶斯
-    clf = GaussianNB()
-    clf.fit(X_train, y_train)
-    y_sample_bayes = clf.predict(X_test)
+    nb = GaussianNB()
+    nb.fit(X_train, y_train)
+    y_sample_bayes = nb.predict(X_test)
     Bayes_ACC = cluster_acc(y_test, y_sample_bayes)
     print("Bayes_ACC =", Bayes_ACC)
 
