@@ -25,7 +25,8 @@ from LogisticRegression_classification2 import comparision_CIFAR10
 from SVM_classification1 import classifier_comparison
 from SVM_classification2 import LRandNBandKNNandSVM
 from SVM_classification3 import comparision_CIFAR10
+
 if __name__ == '__main__':
-    classifier_comparison()
+    show_compressed_image()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

@@ -25,6 +25,7 @@ def cluster_acc(y_true, y_pred):
     # Return
         accuracy, in [0,1]
     """
+    y_pred = np.array(y_pred).astype(np.int64)
     y_true = np.array(y_true).astype(np.int64)
     assert y_pred.size == y_true.size
     D = max(y_pred.max(), y_true.max()) + 1

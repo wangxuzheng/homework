@@ -24,7 +24,6 @@ def Kmeans4():
     for i in range(2, k + 1):
         cluster = KMeans(n_clusters=i, random_state=9).fit(X)
         centroid = cluster.cluster_centers_  # 查看聚类后的质心
-        print(centroid)
         y_pred = cluster.labels_  # 获取训练后对象的每个样本的标签
         # 重新变成图片308*468
         y_pred = y_pred.reshape(h, w)

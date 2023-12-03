@@ -14,6 +14,8 @@ from sklearn.neighbors import KNeighborsClassifier
 from clustering_performance import cluster_acc
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn import svm
+from sklearn.preprocessing import LabelBinarizer
+
 
 def get_face_images(path, n_people=10, n_faces=20):
     """
@@ -238,11 +240,15 @@ def get_LogisticRe_acc(*data):
 
 def get_LinearRe_acc(*data):
     X_train, X_test, y_train, y_test = data
+    labelbin = LabelBinarizer() # 转为one_hot
+    y_one_hot = labelbin.fit_transform(y_train) #(160,10) ,y_train为(160,1)
     linear = LinearRegression()
-    linear.fit(X_train, y_train)
-    ACC = linear.score(X_test, y_test)
-    why = linear.predict(X_test)  #为什么predict的结果是0.5486xxxx，不是整数？
-    #线性回归的分类，但是因为返回的是连续的数值（并非类别标签），所以要设置一个阈值手动划分一下类别
+    linear.fit(X_train, y_one_hot)
+    y_sample = linear.predict(X_test) #线性回归的分类，因为返回的是连续的数值（每个类别的概率，并非类别标签）,
+    # 比如每个样本在每个类别（0-9）有概率（0.55，-0.12,...,0.32）十个，用argmax取概率最大的那个索引（索引即类别0-9）
+    b =y_sample.argmax(axis=1)#返回数组沿着某一条轴最大值的索引
+    y_sample = labelbin.inverse_transform(y_sample)
+    ACC = cluster_acc(y_test, y_sample)
     return ACC
 
 
