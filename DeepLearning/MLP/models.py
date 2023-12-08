@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F  # 激励函数的库
 
 
-# 建立一个四层感知机网络
+# 建立一个三层感知机网络
 class MLP(torch.nn.Module):  # 继承 torch 的 Module
     data_dimension = 32*32*3   # 28*28 for mnist , 32*32*3 for cifar10
     def __init__(self):

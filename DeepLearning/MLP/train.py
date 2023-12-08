@@ -9,8 +9,9 @@ import numpy as np
 
 # 定义全局变量
 path = '../DeepLearning/dataset'
-n_epochs = 3000  # epoch 的数目
+n_epochs = 100  # epoch 的数目
 batch_size = 20  # 决定每次读取多少图片
+learning_rate = 0.02 #学习率
 train_acc_list = []
 train_loss_list = []
 test_acc_list = []
@@ -30,7 +31,7 @@ print("Current device:", device)
 
 # 定义训练集个测试集
 train_data = datasets.CIFAR10(root=path, train=True, transform=transforms.ToTensor(), download=False)
-test_data = datasets.CIFAR10(root=path, train=True, transform=transforms.ToTensor(), download=False)
+test_data = datasets.CIFAR10(root=path, train=False, transform=transforms.ToTensor(), download=False)
 
 # 创建加载器
 train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, num_workers=0)
@@ -51,7 +52,7 @@ model = MLP()
 model = model.to(device)
 
 # SGD随机梯度下降法,lr学习率(步长),这里随机梯度和小批量随机梯度共用.SGD
-optimizer = torch.optim.SGD(params=model.parameters(), lr=0.02)
+optimizer = torch.optim.SGD(params=model.parameters(), lr=learning_rate)
 
 # 调用所有GPU
 model = torch.nn.DataParallel(model)
@@ -90,7 +91,7 @@ def test():
     correct = 0
     total = 0
     test_loss = 0.0
-    with torch.no_grad():  # 训练集中不需要反向传播
+    with torch.no_grad():  # 测试集中不需要反向传播
         for data, labels in test_loader:
             data = data.to(device)
             labels = labels.to(device)
@@ -113,7 +114,6 @@ t_total = time.time()
 for epoch in range(n_epochs):
     train(epoch)
     current_accuracy = test()
-
 
 # 保存模型
 #torch.save(model, 'model.pt')
