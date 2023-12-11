@@ -27,6 +27,6 @@ from SVM_classification2 import LRandNBandKNNandSVM
 from SVM_classification3 import comparision_CIFAR10
 
 if __name__ == '__main__':
-    show_compressed_image()
+    classifier_comparison()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

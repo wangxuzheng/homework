@@ -1,11 +1,3 @@
-"""resnet in pytorch
-
-[1] Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun.
-
-    Deep Residual Learning for Image Recognition
-    https://arxiv.org/abs/1512.03385v1
-"""
-
 import torch.nn as nn
 
 class BasicBlock(nn.Module):
@@ -76,7 +68,7 @@ class BottleNeck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block, num_block, num_classes=100):
+    def __init__(self, block, num_block, num_classes=10):
         super().__init__()
 
         self.in_channels = 64

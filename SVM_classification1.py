@@ -29,10 +29,10 @@ def classifier_comparison ():
     # KNN
     plt.subplot(2, 3, 2)
     knn = KNeighborsClassifier()
-    knn.fit(X_train,y_train)
+    knn.fit(X_train, y_train)
     y_sample = knn.predict(X_test)
     plt.scatter(X_test[:, 0], X_test[:, 1], s=100, marker="o", edgecolors='black', c=colors[y_sample])
-    knn_acc = cluster_acc(y_test,y_sample)
+    knn_acc = cluster_acc(y_test, y_sample)
     plt.title('KNN(acc={})'.format(knn_acc))
 
 

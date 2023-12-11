@@ -21,7 +21,7 @@ def KNN2():
         correct = 0
         knn = KNeighborsClassifier(k)
         for train, test in loo.split(X):  # 对测试机和训练集进行分割
-            knn.fit(X[train], y[train])  # 初始化svm进行训练。
+            knn.fit(X[train], y[train])  # 初始化knn进行训练。
             y_sample = knn.predict(X[test])
             if y_sample == y[test]:  # 如果是正确的就累积+1
                 correct += 1

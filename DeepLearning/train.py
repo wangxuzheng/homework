@@ -1,23 +1,27 @@
 import time
-import torch
-from torchvision import datasets
-import torchvision.transforms as transforms
+
 import matplotlib.pyplot as plt
 import numpy as np
-from models import CNN
-
+import torch
+import torchvision.transforms as transforms
+from torchvision import datasets
+from DeepLearning.models.mlp import MLP
+from DeepLearning.models.cnn import CNN
+from DeepLearning.models.resnet import resnet18 as resnet
+from DeepLearning.models.vgg import vgg16_bn as vgg
 # 定义全局变量
-path = '../DeepLearning/dataset'
-n_epochs = 100  # epoch 的数目
-batch_size = 20  # 决定每次读取多少图片
 
+
+path = '../DeepLearning/dataset'# 数据集
+n_epochs = 30  # epoch 的数目
+batch_size = 20  # 决定每次读取多少图片
+learning_rate = 0.02 #学习率
 train_acc_list = []
 train_loss_list = []
 test_acc_list = []
 test_loss_list = []
 print("GPU是否可用：", torch.cuda.is_available())  # 查看GPU是否可用
 print("GPU数量：", torch.cuda.device_count())  # 查看GPU数量
-print("GPU索引号：", torch.cuda.current_device())  # 查看GPU索引号
 print("GPU名称：", torch.cuda.get_device_name(0))  # 根据索引号得到GPU名称
 device = (
     "cuda"
@@ -26,7 +30,7 @@ device = (
     if torch.backends.mps.is_available()
     else "cpu"
 )
-print("Current device:", device)
+
 
 # 定义训练集个测试集
 train_data = datasets.CIFAR10(root=path, train=True, transform=transforms.ToTensor(), download=False)
@@ -38,7 +42,7 @@ test_loader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, num_
 # num_workers可以＞0,是调用系统子进程来跑,但是Windows可能会因为各种权限问题报错
 
 # Model and optimizer
-model = CNN()
+model = resnet()
 
 #load the trained model
 #Remember that you must call model.eval() to set dropout and batch normalization
@@ -50,8 +54,8 @@ model = CNN()
 #load the model to gpu or cpu
 model = model.to(device)
 
-# SGD随机梯度下降法,lr学习率(步长),这里随机梯度和小批量随机梯度共用.SGD
-optimizer = torch.optim.SGD(params=model.parameters(), lr=0.02)
+# 优化器SGD
+optimizer = torch.optim.SGD(params=model.parameters(), lr=learning_rate)
 
 # 调用所有GPU
 model = torch.nn.DataParallel(model)
@@ -80,7 +84,7 @@ def train(epoch):
     train_acc_list.append(correct / total)
     train_loss = train_loss / len(train_loader.dataset)
     train_loss_list.append(train_loss)
-    print('Epoch:  {}  \tTraining Loss: {:.6f}'.format(epoch, train_loss))
+    print('Epoch:  {}/{}  \tTraining Loss: {:.6f}'.format(epoch+1,n_epochs, train_loss))
 
 
 # 在数据集上测试神经网络
@@ -90,7 +94,7 @@ def test():
     correct = 0
     total = 0
     test_loss = 0.0
-    with torch.no_grad():  # 训练集中不需要反向传播
+    with torch.no_grad():  # 测试集中不需要反向传播
         for data, labels in test_loader:
             data = data.to(device)
             labels = labels.to(device)
@@ -113,7 +117,6 @@ t_total = time.time()
 for epoch in range(n_epochs):
     train(epoch)
     current_accuracy = test()
-
 
 # 保存模型
 #torch.save(model, 'model.pt')

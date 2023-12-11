@@ -18,7 +18,7 @@ def eigenfaces_RGB():
     COL = 20  # 指定拼接图片的列数，即每个人有多少图片
     PATH = 'face_images/'
     n_components = 10  #用PCA降维，n_components为降到的维数   主成分数量
-    h, w,c = 200, 180,3  #图片高度h，图片宽度w,图片rgb通道c
+    h, w, c = 200, 180, 3  #图片高度h，图片宽度w,图片rgb通道c
     y_true = []  # 真实值,这里真实值是指图片被分为10类，从0-9，每一个人一类，即一个人有20张表情，但是都为一类。
     y_pred = []  # 预测值，通过kmeans聚类，k=10,聚成10类人脸，每类人脸20个表情。
     photos_data, y_true = get_face_images(PATH, ROW, COL) #photos_data为ndarray(200,108000)
